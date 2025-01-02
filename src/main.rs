@@ -1,20 +1,41 @@
+use std::net::{IpAddr, Ipv4Addr};
+
 use bpaf::*;
 
 #[derive(Debug, Clone)]
 struct Options {
-    speed: i32,
+	skip_wizard: bool,
+	port:        u16,
+	host:        IpAddr,
 }
 
 fn options() -> impl Parser<Options> {
-    let speed = long("speed")
-        .help("Set the speed value")
-        .argument::<i32>("SPEED")
-        .fallback(0);
+	let skip_wizard = long("skip-wizard")
+		.short('s')
+		.help("")
+		.argument::<bool>("SKIP-WIZARD")
+		.fallback(false);
 
-    construct!(Options { speed })
+	let port = long("port")
+		.short('p')
+		.help("")
+		.argument::<u16>("PORT")
+		.fallback(8080);
+
+	let host = long("host")
+		.short('h')
+		.help("")
+		.argument::<IpAddr>("HOST")
+		.fallback(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)));
+
+	construct!(Options {
+		skip_wizard,
+		port,
+		host
+	})
 }
 
 fn main() {
-    let opts = options().run();
-    dbg!(opts.speed);
+	let opts = options().run();
+	dbg!(opts);
 }
