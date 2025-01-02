@@ -1,6 +1,7 @@
-use std::io;
+use std::{io, time::{Duration, Instant}};
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use rand::seq::SliceRandom;
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -18,10 +19,23 @@ fn main() -> io::Result<()> {
     app_result
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App {
     counter: u8,
     exit: bool,
+    current_word: String,
+    last_update: Instant,
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self {
+            counter: 0,
+            exit: false,
+            current_word: String::from("Lorem"),
+            last_update: Instant::now(),
+        }
+    }
 }
 
 impl App {
@@ -36,20 +50,55 @@ impl App {
     }
 
     fn draw(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.area());
+        let chunks = ratatui::layout::Layout::default()
+            .direction(ratatui::layout::Direction::Horizontal)
+            .constraints([
+                ratatui::layout::Constraint::Percentage(50),
+                ratatui::layout::Constraint::Percentage(50),
+            ])
+            .split(frame.size());
+
+        // 左側のカウンター
+        frame.render_widget(self, chunks[0]);
+
+        // 右側のlorem ipsum
+        let word_block = Block::bordered().title(" Lorem Ipsum ");
+        let word_text = Text::from(self.current_word.as_str());
+        frame.render_widget(
+            Paragraph::new(word_text).block(word_block).centered(),
+            chunks[1],
+        );
     }
 
     /// updates the application's state based on user input
     fn handle_events(&mut self) -> io::Result<()> {
-        match event::read()? {
-            // it's important to check that the event is a key press event as
-            // crossterm also emits key release and repeat events on Windows.
-            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
-                self.handle_key_event(key_event)
+        if event::poll(Duration::from_millis(100))? {
+            match event::read()? {
+                Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
+                    self.handle_key_event(key_event)
+                }
+                _ => {}
             }
-            _ => {}
-        };
+        }
+
+        // 1秒ごとに単語を更新
+        if self.last_update.elapsed() >= Duration::from_secs(1) {
+            self.update_word();
+            self.last_update = Instant::now();
+        }
         Ok(())
+    }
+
+    fn update_word(&mut self) {
+        const LOREM_WORDS: &[&str] = &[
+            "Lorem", "ipsum", "dolor", "sit", "amet", "consectetur",
+            "adipiscing", "elit", "sed", "do", "eiusmod", "tempor",
+            "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua",
+        ];
+        
+        if let Some(word) = LOREM_WORDS.choose(&mut rand::thread_rng()) {
+            self.current_word = word.to_string();
+        }
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
