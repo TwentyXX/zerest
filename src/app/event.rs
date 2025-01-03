@@ -4,7 +4,7 @@ use std::{
 	time::{Duration, Instant},
 };
 
-use super::App;
+use super::{App, FocusedWidget};
 
 impl App {
 	pub(crate) fn handle_events(&mut self) -> io::Result<()> {
