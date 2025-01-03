@@ -15,6 +15,15 @@ pub struct App {
     pub(crate) checkbox_state: bool,
     pub(crate) slider_value: u8,
     pub(crate) input_text: String,
+    pub(crate) focused_widget: FocusedWidget,
+}
+
+#[derive(Debug, PartialEq)]
+pub(crate) enum FocusedWidget {
+    Counter,
+    Checkbox,
+    Slider,
+    Input,
 }
 
 impl Default for App {
@@ -27,7 +36,28 @@ impl Default for App {
             checkbox_state: false,
             slider_value: 50,
             input_text: String::new(),
+            focused_widget: FocusedWidget::Counter,
         }
+    }
+}
+
+impl App {
+    fn next_focus(&mut self) {
+        self.focused_widget = match self.focused_widget {
+            FocusedWidget::Counter => FocusedWidget::Checkbox,
+            FocusedWidget::Checkbox => FocusedWidget::Slider,
+            FocusedWidget::Slider => FocusedWidget::Input,
+            FocusedWidget::Input => FocusedWidget::Counter,
+        };
+    }
+
+    fn previous_focus(&mut self) {
+        self.focused_widget = match self.focused_widget {
+            FocusedWidget::Counter => FocusedWidget::Input,
+            FocusedWidget::Checkbox => FocusedWidget::Counter,
+            FocusedWidget::Slider => FocusedWidget::Checkbox,
+            FocusedWidget::Input => FocusedWidget::Slider,
+        };
     }
 }
 

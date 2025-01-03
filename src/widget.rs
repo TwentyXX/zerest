@@ -35,19 +35,43 @@ impl Widget for &App {
             "Counter: ".into(),
             self.counter.to_string().yellow(),
         ])]);
+        let counter_block = Block::default()
+            .borders(Borders::ALL)
+            .title(" Counter ")
+            .border_style(Style::default().fg(if self.focused_widget == FocusedWidget::Counter {
+                Color::Cyan
+            } else {
+                Color::White
+            }));
         Paragraph::new(counter_text)
-            .block(Block::default().borders(Borders::ALL).title(" Counter "))
+            .block(counter_block)
             .render(chunks[0], buf);
 
         // Checkbox
         let checkbox_text = format!("[{}] Checkbox Option", if self.checkbox_state { "x" } else { " " });
+        let checkbox_block = Block::default()
+            .borders(Borders::ALL)
+            .title(" Checkbox ")
+            .border_style(Style::default().fg(if self.focused_widget == FocusedWidget::Checkbox {
+                Color::Cyan
+            } else {
+                Color::White
+            }));
         Paragraph::new(checkbox_text)
-            .block(Block::default().borders(Borders::ALL).title(" Checkbox "))
+            .block(checkbox_block)
             .render(chunks[1], buf);
 
         // Slider/Gauge
+        let slider_block = Block::default()
+            .borders(Borders::ALL)
+            .title(" Slider ")
+            .border_style(Style::default().fg(if self.focused_widget == FocusedWidget::Slider {
+                Color::Cyan
+            } else {
+                Color::White
+            }));
         Gauge::default()
-            .block(Block::default().borders(Borders::ALL).title(" Slider "))
+            .block(slider_block)
             .gauge_style(Style::default().fg(Color::Yellow))
             .ratio(f64::from(self.slider_value) / 100.0)
             .label(format!("{}%", self.slider_value))
@@ -59,8 +83,16 @@ impl Widget for &App {
         } else {
             self.input_text.clone()
         };
+        let input_block = Block::default()
+            .borders(Borders::ALL)
+            .title(" Input ")
+            .border_style(Style::default().fg(if self.focused_widget == FocusedWidget::Input {
+                Color::Cyan
+            } else {
+                Color::White
+            }));
         Paragraph::new(input_text)
-            .block(Block::default().borders(Borders::ALL).title(" Input "))
+            .block(input_block)
             .render(chunks[3], buf);
     }
 }

@@ -29,8 +29,19 @@ impl App {
             KeyCode::Left => self.decrement_counter(),
             KeyCode::Right => self.increment_counter(),
             KeyCode::Char(' ') => self.checkbox_state = !self.checkbox_state,
-            KeyCode::Up => self.slider_value = self.slider_value.saturating_add(5).min(100),
-            KeyCode::Down => self.slider_value = self.slider_value.saturating_sub(5),
+            KeyCode::Tab => self.next_focus(),
+            KeyCode::Up => {
+                match self.focused_widget {
+                    FocusedWidget::Slider => self.slider_value = self.slider_value.saturating_add(5).min(100),
+                    _ => self.previous_focus(),
+                }
+            },
+            KeyCode::Down => {
+                match self.focused_widget {
+                    FocusedWidget::Slider => self.slider_value = self.slider_value.saturating_sub(5),
+                    _ => self.next_focus(),
+                }
+            },
             KeyCode::Char(c) => self.input_text.push(c),
             KeyCode::Backspace => { self.input_text.pop(); }
             _ => {}
