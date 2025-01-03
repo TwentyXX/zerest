@@ -24,7 +24,10 @@ impl App {
         let word_block = Block::bordered().title(" Lorem Ipsum ");
         let word_text = Text::from(self.current_word.as_str());
         frame.render_widget(
-            Paragraph::new(word_text).block(word_block).centered(),
+            Paragraph::new(word_text)
+                .block(word_block)
+                .centered()
+                .wrap(ratatui::widgets::Wrap { trim: true }),
             chunks[1],
         );
     }
