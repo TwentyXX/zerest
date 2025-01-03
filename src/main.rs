@@ -2,7 +2,7 @@ mod app;
 mod widget;
 
 use std::io;
-use app::App;
+use crate::app::App;
 
 fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
