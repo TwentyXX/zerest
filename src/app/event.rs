@@ -39,7 +39,7 @@ impl App {
 		match_patterns!(key_code, {
 			KeyCode::Up => {
 				self.previous_focus();
-			},
+			}
 			KeyCode::Down => {
 				self.next_focus();
 			}
