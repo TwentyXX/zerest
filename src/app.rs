@@ -11,10 +11,10 @@ use ratatui::{
 
 #[derive(Debug)]
 pub struct App {
-    counter: u8,
-    exit: bool,
-    current_word: String,
-    last_update: Instant,
+    pub(crate) counter: u8,
+    pub(crate) exit: bool,
+    pub(crate) current_word: String,
+    pub(crate) last_update: Instant,
 }
 
 impl Default for App {
@@ -38,7 +38,7 @@ impl App {
         Ok(())
     }
 
-    fn draw(&self, frame: &mut Frame) {
+    pub(crate) fn draw(&self, frame: &mut Frame) {
         let chunks = layout::Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
@@ -60,7 +60,7 @@ impl App {
     }
 
     /// updates the application's state based on user input
-    fn handle_events(&mut self) -> io::Result<()> {
+    pub(crate) fn handle_events(&mut self) -> io::Result<()> {
         if event::poll(Duration::from_millis(100))? {
             match event::read()? {
                 Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
@@ -78,7 +78,7 @@ impl App {
         Ok(())
     }
 
-    fn update_word(&mut self) {
+    pub(crate) fn update_word(&mut self) {
         const LOREM_WORDS: &[&str] = &[
             "Lorem", "ipsum", "dolor", "sit", "amet", "consectetur",
             "adipiscing", "elit", "sed", "do", "eiusmod", "tempor",
@@ -91,7 +91,7 @@ impl App {
         }
     }
 
-    fn handle_key_event(&mut self, key_event: KeyEvent) {
+    pub(crate) fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left => self.decrement_counter(),
@@ -100,15 +100,15 @@ impl App {
         }
     }
 
-    fn exit(&mut self) {
+    pub(crate) fn exit(&mut self) {
         self.exit = true;
     }
 
-    fn increment_counter(&mut self) {
+    pub(crate) fn increment_counter(&mut self) {
         self.counter += 1;
     }
 
-    fn decrement_counter(&mut self) {
+    pub(crate) fn decrement_counter(&mut self) {
         self.counter -= 1;
     }
 }
