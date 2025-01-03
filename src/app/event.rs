@@ -28,6 +28,11 @@ impl App {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left => self.decrement_counter(),
             KeyCode::Right => self.increment_counter(),
+            KeyCode::Char(' ') => self.checkbox_state = !self.checkbox_state,
+            KeyCode::Up => self.slider_value = self.slider_value.saturating_add(5).min(100),
+            KeyCode::Down => self.slider_value = self.slider_value.saturating_sub(5),
+            KeyCode::Char(c) => self.input_text.push(c),
+            KeyCode::Backspace => { self.input_text.pop(); }
             _ => {}
         }
     }

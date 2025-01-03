@@ -12,6 +12,9 @@ pub struct App {
     pub(crate) exit: bool,
     pub(crate) current_word: String,
     pub(crate) last_update: Instant,
+    pub(crate) checkbox_state: bool,
+    pub(crate) slider_value: u8,
+    pub(crate) input_text: String,
 }
 
 impl Default for App {
@@ -21,6 +24,9 @@ impl Default for App {
             exit: false,
             current_word: String::from("Lorem"),
             last_update: Instant::now(),
+            checkbox_state: false,
+            slider_value: 50,
+            input_text: String::new(),
         }
     }
 }
