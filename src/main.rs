@@ -1,15 +1,14 @@
 mod app;
 mod widget;
 
-use std::io;
 use crate::app::App;
+use std::io;
 
 fn main() -> io::Result<()> {
-    let mut terminal = ratatui::init();
-    let app_result = App::default().run(&mut terminal);
-    ratatui::restore();
-    app_result
+	let mut terminal = ratatui::init();
+	let app_result = App::default().run(&mut terminal);
+	ratatui::restore();
+	app_result
 }
 
-#[cfg(test)]
-mod tests;
+#[cfg(test)] mod tests;
