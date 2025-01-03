@@ -82,7 +82,7 @@ impl App {
         }
 
         // 1秒ごとに単語を更新
-        if self.last_update.elapsed() >= Duration::from_secs(1) {
+        if self.last_update.elapsed() >= Duration::from_millis(100) {
             self.update_word();
             self.last_update = Instant::now();
         }
@@ -97,7 +97,8 @@ impl App {
         ];
         
         if let Some(word) = LOREM_WORDS.choose(&mut rand::thread_rng()) {
-            self.current_word = word.to_string();
+            self.current_word += word;
+						self.current_word += " ";
         }
     }
 
@@ -152,47 +153,4 @@ impl Widget for &App {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use ratatui::style::Style;
-
-    #[test]
-    fn render() {
-        let app = App::default();
-        let mut buf = Buffer::empty(Rect::new(0, 0, 50, 4));
-
-        app.render(buf.area, &mut buf);
-
-        let mut expected = Buffer::with_lines(vec![
-            "┏━━━━━━━━━━━━━ Counter App Tutorial ━━━━━━━━━━━━━┓",
-            "┃                    Value: 0                    ┃",
-            "┃                                                ┃",
-            "┗━ Decrement <Left> Increment <Right> Quit <Q> ━━┛",
-        ]);
-        let title_style = Style::new().bold();
-        let counter_style = Style::new().yellow();
-        let key_style = Style::new().blue().bold();
-        expected.set_style(Rect::new(14, 0, 22, 1), title_style);
-        expected.set_style(Rect::new(28, 1, 1, 1), counter_style);
-        expected.set_style(Rect::new(13, 3, 6, 1), key_style);
-        expected.set_style(Rect::new(30, 3, 7, 1), key_style);
-        expected.set_style(Rect::new(43, 3, 4, 1), key_style);
-
-        assert_eq!(buf, expected);
-    }
-    #[test]
-    fn handle_key_event() -> io::Result<()> {
-        let mut app = App::default();
-        app.handle_key_event(KeyCode::Right.into());
-        assert_eq!(app.counter, 1);
-
-        app.handle_key_event(KeyCode::Left.into());
-        assert_eq!(app.counter, 0);
-
-        let mut app = App::default();
-        app.handle_key_event(KeyCode::Char('q').into());
-        assert!(app.exit);
-
-        Ok(())
-    }
-}
+mod tests;
