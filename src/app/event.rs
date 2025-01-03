@@ -1,3 +1,4 @@
+use std::time::Instant;
 use std::{io, time::Duration};
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 
