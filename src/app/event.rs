@@ -1,11 +1,10 @@
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use crate::app::FocusedWidget;
 use std::{
 	io,
 	time::{Duration, Instant},
 };
 
-use super::{App, FocusedWidget};
+use super::App;
 
 impl App {
 	pub(crate) fn handle_events(&mut self) -> io::Result<()> {
@@ -39,19 +38,6 @@ impl App {
 			}
 			_ => {}
 		}
-		let a = (2, 3);
-		case!(a, {
-			(_, 2) => println!(),
-		});
-		
-		macro_rules! case {
-    ($value:expr, {$($pattern:pat => $result:expr),+}) => {
-        match $value {
-            $($pattern => {$result;return;},)*
-            _ => Default::default()
-        }
-    };
-}
 		match self.focused_widget {
 			FocusedWidget::Counter => match key_code {
 				KeyCode::Left => self.decrement_counter(),

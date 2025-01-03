@@ -7,8 +7,6 @@ use ratatui::{
 	widgets::{Block, Borders, Gauge, Paragraph, Widget},
 };
 
-use crate::app::FocusedWidget;
-
 use crate::app::{App, FocusedWidget};
 
 impl Widget for &App {
