@@ -28,7 +28,7 @@ impl App {
 	pub(crate) fn handle_key_event(&mut self, key_event: KeyEvent) {
 		let key_code = key_event.code;
 		macro_rules! match_patterns {
-			($value:expr, {$($pattern:pat => $result:expr),* $(,)*}) => {
+			($value:expr, {$($pattern:pat => $result:expr $(,)?)*}) => {
 				match $value {
 					$($pattern => $result,)*
 					_ => {}
@@ -38,10 +38,10 @@ impl App {
 
 		match_patterns!(key_code, {
 			KeyCode::Up => {
-				self.previous_focus();
+				self.previous_focus()
 			}
 			KeyCode::Down => {
-				self.next_focus();
+				self.next_focus()
 			}
 		});
 		// match key_code {
