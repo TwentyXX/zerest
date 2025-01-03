@@ -1,4 +1,5 @@
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use crate::app::FocusedWidget;
 use std::{
 	io,
 	time::{Duration, Instant},
