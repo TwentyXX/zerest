@@ -6,6 +6,15 @@ use std::{
 
 use super::{App, FocusedWidget};
 
+macro_rules! guard {
+	($value:expr, $($pattern:pat => $result:expr $(,)?)*) => {
+		match $value {
+			$($pattern => $result,)*
+			_ => {}
+		}
+	};
+}
+
 impl App {
 	pub(crate) fn handle_events(&mut self) -> io::Result<()> {
 		if event::poll(Duration::from_millis(100))? {
@@ -27,15 +36,6 @@ impl App {
 
 	pub(crate) fn handle_key_event(&mut self, key_event: KeyEvent) {
 		let key_code = key_event.code;
-		macro_rules! guard {
-			($value:expr, $($pattern:pat => $result:expr $(,)?)*) => {
-				match $value {
-					$($pattern => $result,)*
-					_ => {}
-				}
-			};
-		}
-
 		guard!(key_code,
 			KeyCode::Up => self.previous_focus()
 			KeyCode::Down => self.next_focus()
