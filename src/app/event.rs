@@ -9,7 +9,10 @@ use super::{App, FocusedWidget};
 macro_rules! guard {
 	($value:expr, $($pattern:pat => $result:expr $(,)?)*) => {
 		match $value {
-			$($pattern => $result,)*
+			$($pattern => {
+				$result;
+				return
+			},)*
 			_ => {}
 		}
 	};
@@ -39,36 +42,31 @@ impl App {
 		guard!(key_code,
 			KeyCode::Up => self.previous_focus()
 			KeyCode::Down => self.next_focus()
+			KeyCode::Tab => self.next_focus(),
 		);
-		match self.focused_widget {
-			FocusedWidget::Counter => match key_code {
+		guard!(self.focused_widget,
+			FocusedWidget::Input => guard!(key_code,
+				KeyCode::Char(c) => self.input_text.push(c),
+				KeyCode::Backspace => {
+					self.input_text.pop();
+				}
+			)
+		);
+		guard!(self.focused_widget,
+			FocusedWidget::Counter => guard!(key_code,
 				KeyCode::Left => self.decrement_counter(),
 				KeyCode::Right => self.increment_counter(),
 				KeyCode::Char('q') => self.exit(),
-				KeyCode::Char(' ') => self.checkbox_state = !self.checkbox_state,
-				KeyCode::Tab => self.next_focus(),
 				KeyCode::Char(c) => self.input_text.push(c),
-				KeyCode::Backspace => {
-					self.input_text.pop();
-				}
-				_ => {}
-			},
-			FocusedWidget::Checkbox => match key_code {
-				KeyCode::Char(' ') => self.checkbox_state = !self.checkbox_state,
-				_ => {}
-			},
-			FocusedWidget::Slider => match key_code {
-				KeyCode::Left => self.slider_value = self.slider_value.saturating_sub(5),
-				KeyCode::Right => self.slider_value = self.slider_value.saturating_add(5).min(100),
-				_ => {}
-			},
-			FocusedWidget::Input => match key_code {
-				KeyCode::Char(c) => self.input_text.push(c),
-				KeyCode::Backspace => {
-					self.input_text.pop();
-				}
-				_ => {}
-			},
-		}
+				KeyCode::Backspace => self.input_text.pop(),
+				),
+				FocusedWidget::Checkbox => guard!(key_code,
+					KeyCode::Char(' ') => self.checkbox_state = !self.checkbox_state,
+				),
+				FocusedWidget::Slider => guard!(key_code,
+					KeyCode::Left => self.slider_value = self.slider_value.saturating_sub(5),
+					KeyCode::Right => self.slider_value = self.slider_value.saturating_add(5).min(100),
+				),
+		);
 	}
 }
