@@ -50,19 +50,27 @@ impl App {
 				KeyCode::Backspace => self.input_text.pop(),
 			)
 		);
-		guard!(self.focused_widget,
-			FocusedWidget::Counter => guard!(key_code,
-				KeyCode::Left => self.decrement_counter(),
-				KeyCode::Right => self.increment_counter(),
-			),
-			FocusedWidget::Checkbox => guard!(key_code,
-				KeyCode::Char(' ') => self.checkbox_state = !self.checkbox_state,
-			),
-			FocusedWidget::Slider => guard!(key_code,
-				KeyCode::Left => self.slider_value = self.slider_value.saturating_sub(5),
-				KeyCode::Right => self.slider_value = self.slider_value.saturating_add(5).min(100),
-			),
-		);
+		match self.focused_widget {
+			FocusedWidget::Counter => {
+				guard!(key_code,
+					KeyCode::Left => self.decrement_counter(),
+					KeyCode::Right => self.increment_counter(),
+				);
+			}
+			FocusedWidget::Checkbox => {
+				guard!(key_code,
+					KeyCode::Char(' ') =>
+					self.checkbox_state = !self.checkbox_state
+				);
+			}
+			FocusedWidget::Slider => {
+				guard!(key_code,
+					KeyCode::Left => self.slider_value = self.slider_value.saturating_sub(5),
+					KeyCode::Right => self.slider_value = self.slider_value.saturating_add(5).min(100)
+				);
+			}
+			_ => {}
+		};
 		guard!(key_code,
 			KeyCode::Char('q') => self.exit(),
 		)
