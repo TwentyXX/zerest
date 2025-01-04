@@ -27,8 +27,8 @@ impl App {
 
 	pub(crate) fn handle_key_event(&mut self, key_event: KeyEvent) {
 		let key_code = key_event.code;
-		macro_rules! match_patterns {
-			($value:expr, {$($pattern:pat => $result:expr $(,)?)*}) => {
+		macro_rules! guard {
+			($value:expr, $($pattern:pat => $result:expr $(,)?)*) => {
 				match $value {
 					$($pattern => $result,)*
 					_ => {}
@@ -36,25 +36,10 @@ impl App {
 			};
 		}
 
-		match_patterns!(key_code, {
-			KeyCode::Up => {
-				self.previous_focus()
-			}
-			KeyCode::Down => {
-				self.next_focus()
-			}
-		});
-		// match key_code {
-		// 	KeyCode::Up => {
-		// 		self.previous_focus();
-		// 		return;
-		// 	}
-		// 	KeyCode::Down => {
-		// 		self.next_focus();
-		// 		return;
-		// 	}
-		// 	_ => {}
-		// }
+		guard!(key_code,
+			KeyCode::Up => self.previous_focus()
+			KeyCode::Down => self.next_focus()
+		);
 		match self.focused_widget {
 			FocusedWidget::Counter => match key_code {
 				KeyCode::Left => self.decrement_counter(),
