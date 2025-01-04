@@ -11,9 +11,9 @@ use crate::app::{App, FocusedWidget};
 
 impl Widget for &App {
 	fn render(self, area: Rect, buf: &mut Buffer) {
-		let block = Block::bordered()
-			.title(" Control Panel ".bold())
-			.border_set(border::THICK);
+		// let block = Block::bordered()
+		// 	.title(" Control Panel ".bold())
+		// 	.border_set(border::THICK);
 
 		// Create a layout for the widgets
 		let chunks = Layout::default()
@@ -27,17 +27,18 @@ impl Widget for &App {
 			])
 			.split(area);
 
-		// Render the main block
-		block.render(area, buf);
+		// // Render the main block
+		// block.render(area, buf);
 
 		// Counter
 		let counter_text = Text::from(vec![Line::from(vec![
 			"Counter: ".into(),
 			self.counter.to_string().yellow(),
 		])]);
+
 		let counter_block = Block::default()
 			.borders(Borders::ALL)
-			.title(" Counter ")
+			.title(Line::from(" Counter ").centered())
 			.border_style(
 				Style::default().fg(if self.focused_widget == FocusedWidget::Counter {
 					Color::Cyan
@@ -60,7 +61,7 @@ impl Widget for &App {
 		);
 		let checkbox_block = Block::default()
 			.borders(Borders::ALL)
-			.title(" Checkbox ")
+			.title(Line::from(" Checkbox ").centered())
 			.border_style(
 				Style::default().fg(if self.focused_widget == FocusedWidget::Checkbox {
 					Color::Cyan
@@ -75,7 +76,7 @@ impl Widget for &App {
 		// Slider/Gauge
 		let slider_block = Block::default()
 			.borders(Borders::ALL)
-			.title(" Slider ")
+			.title(Line::from(" Slider ").centered())
 			.border_style(
 				Style::default().fg(if self.focused_widget == FocusedWidget::Slider {
 					Color::Cyan
@@ -98,7 +99,7 @@ impl Widget for &App {
 		};
 		let input_block = Block::default()
 			.borders(Borders::ALL)
-			.title(" Input ")
+			.title(Line::from(" Input ").centered())
 			.border_style(
 				Style::default().fg(if self.focused_widget == FocusedWidget::Input {
 					Color::Cyan
