@@ -2,8 +2,7 @@ use ratatui::{
 	buffer::Buffer,
 	layout::{Constraint, Direction, Layout, Rect},
 	style::{Color, Style, Stylize},
-	symbols::border,
-	text::{Line, Span, Text},
+	text::{Line, Text},
 	widgets::{Block, Borders, Gauge, List, ListItem, Paragraph, Widget},
 };
 
@@ -27,11 +26,13 @@ impl Widget for &App {
 		self.render_checkbox(chunks[1], buf);
 		self.render_slider(chunks[2], buf);
 		self.render_input(chunks[3], buf);
-		self.render_list(chunks[4], buf);
-		self.render_tree(chunks[5], buf);
+		self.render_list_widget(chunks[4], buf);
+		self.render_tree_widget(chunks[5], buf);
 	}
+}
 
-	fn render_list(&self, area: Rect, buf: &mut Buffer) {
+impl App {
+	fn render_list_widget(&self, area: Rect, buf: &mut Buffer) {
 		let items: Vec<ListItem> = self
 			.list_items
 			.iter()
@@ -57,7 +58,7 @@ impl Widget for &App {
 			.render(area, buf);
 	}
 
-	fn render_tree(&self, area: Rect, buf: &mut Buffer) {
+	fn render_tree_widget(&self, area: Rect, buf: &mut Buffer) {
 		let tree_block = Block::default()
 			.borders(Borders::ALL)
 			.title(Line::from(" Tree ").centered())
@@ -81,9 +82,6 @@ impl Widget for &App {
 			.block(tree_block)
 			.render(area, buf);
 	}
-}
-
-impl App {
 	fn render_counter(&self, area: Rect, buf: &mut Buffer) {
 		let counter_text = Text::from(vec![Line::from(vec![
 			"Counter: ".into(),
