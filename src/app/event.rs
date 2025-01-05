@@ -48,6 +48,25 @@ impl App {
 			FocusedWidget::Input => guard!(key_code,
 				KeyCode::Char(c) => self.input_text.push(c),
 				KeyCode::Backspace => self.input_text.pop(),
+			),
+			FocusedWidget::List => guard!(key_code,
+				KeyCode::Up => {
+					self.selected_item = match self.selected_item {
+						Some(i) if i > 0 => Some(i - 1),
+						None if !self.list_items.is_empty() => Some(0),
+						_ => self.selected_item,
+					}
+				},
+				KeyCode::Down => {
+					self.selected_item = match self.selected_item {
+						Some(i) if i < self.list_items.len() - 1 => Some(i + 1),
+						None if !self.list_items.is_empty() => Some(0),
+						_ => self.selected_item,
+					}
+				},
+			),
+			FocusedWidget::Tree => guard!(key_code,
+				KeyCode::Enter => self.tree_state = !self.tree_state,
 			)
 		);
 		match self.focused_widget {
