@@ -3,8 +3,8 @@ use ratatui::{
 	layout::{Constraint, Direction, Layout, Rect},
 	style::{Color, Style, Stylize},
 	symbols::border,
-	text::{Line, Text},
-	widgets::{Block, Borders, Gauge, Paragraph, Widget},
+	text::{Line, Span, Text},
+	widgets::{Block, Borders, Gauge, List, ListItem, Paragraph, Widget},
 };
 
 use crate::app::{App, FocusedWidget};
@@ -14,11 +14,12 @@ impl Widget for &App {
 		let chunks = Layout::default()
 			.direction(Direction::Vertical)
 			.constraints([
-				Constraint::Length(3), // Counter
-				Constraint::Length(3), // Checkbox
-				Constraint::Length(3), // Slider
-				Constraint::Length(3), // Input
-				Constraint::Min(0),    // Remaining space
+				Constraint::Length(3),  // Counter
+				Constraint::Length(3),  // Checkbox
+				Constraint::Length(3),  // Slider
+				Constraint::Length(3),  // Input
+				Constraint::Length(10), // List
+				Constraint::Min(0),     // Tree
 			])
 			.split(area);
 
@@ -26,6 +27,59 @@ impl Widget for &App {
 		self.render_checkbox(chunks[1], buf);
 		self.render_slider(chunks[2], buf);
 		self.render_input(chunks[3], buf);
+		self.render_list(chunks[4], buf);
+		self.render_tree(chunks[5], buf);
+	}
+
+	fn render_list(&self, area: Rect, buf: &mut Buffer) {
+		let items: Vec<ListItem> = self
+			.list_items
+			.iter()
+			.enumerate()
+			.map(|(i, item)| {
+				let style = if Some(i) == self.selected_item {
+					Style::default().fg(Color::Yellow)
+				} else {
+					Style::default()
+				};
+				ListItem::new(item.as_str()).style(style)
+			})
+			.collect();
+
+		let list_block = Block::default()
+			.borders(Borders::ALL)
+			.title(Line::from(" List ").centered())
+			.border_style(Style::default().fg(self.focus_color(FocusedWidget::List)));
+
+		List::new(items)
+			.block(list_block)
+			.highlight_style(Style::default().fg(Color::Yellow))
+			.render(area, buf);
+	}
+
+	fn render_tree(&self, area: Rect, buf: &mut Buffer) {
+		let tree_block = Block::default()
+			.borders(Borders::ALL)
+			.title(Line::from(" Tree ").centered())
+			.border_style(Style::default().fg(self.focus_color(FocusedWidget::Tree)));
+
+		let tree_text = if self.tree_state {
+			vec![
+				Line::from("└── Root"),
+				Line::from("    ├── Branch 1"),
+				Line::from("    │   ├── Leaf 1.1"),
+				Line::from("    │   └── Leaf 1.2"),
+				Line::from("    └── Branch 2"),
+				Line::from("        ├── Leaf 2.1"),
+				Line::from("        └── Leaf 2.2"),
+			]
+		} else {
+			vec![Line::from("└── Root")]
+		};
+
+		Paragraph::new(tree_text)
+			.block(tree_block)
+			.render(area, buf);
 	}
 }
 

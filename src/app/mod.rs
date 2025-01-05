@@ -15,6 +15,9 @@ pub struct App {
 	pub(crate) slider_value:   u8,
 	pub(crate) input_text:     String,
 	pub(crate) focused_widget: FocusedWidget,
+	pub(crate) list_items:     Vec<String>,
+	pub(crate) selected_item:  Option<usize>,
+	pub(crate) tree_state:     bool,
 }
 
 #[derive(Debug, PartialEq)]
@@ -23,6 +26,8 @@ pub(crate) enum FocusedWidget {
 	Checkbox,
 	Slider,
 	Input,
+	List,
+	Tree,
 }
 
 impl Default for App {
@@ -36,6 +41,9 @@ impl Default for App {
 			slider_value:   50,
 			input_text:     String::new(),
 			focused_widget: FocusedWidget::Counter,
+			list_items:     vec!["Item 1".to_string(), "Item 2".to_string(), "Item 3".to_string()],
+			selected_item:  None,
+			tree_state:     false,
 		}
 	}
 }
@@ -46,16 +54,20 @@ impl App {
 			FocusedWidget::Counter => FocusedWidget::Checkbox,
 			FocusedWidget::Checkbox => FocusedWidget::Slider,
 			FocusedWidget::Slider => FocusedWidget::Input,
-			FocusedWidget::Input => FocusedWidget::Counter,
+			FocusedWidget::Input => FocusedWidget::List,
+			FocusedWidget::List => FocusedWidget::Tree,
+			FocusedWidget::Tree => FocusedWidget::Counter,
 		};
 	}
 
 	fn previous_focus(&mut self) {
 		self.focused_widget = match self.focused_widget {
-			FocusedWidget::Counter => FocusedWidget::Input,
+			FocusedWidget::Counter => FocusedWidget::Tree,
 			FocusedWidget::Checkbox => FocusedWidget::Counter,
 			FocusedWidget::Slider => FocusedWidget::Checkbox,
 			FocusedWidget::Input => FocusedWidget::Slider,
+			FocusedWidget::List => FocusedWidget::Input,
+			FocusedWidget::Tree => FocusedWidget::List,
 		};
 	}
 }
