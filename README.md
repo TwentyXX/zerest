@@ -5,6 +5,14 @@ REST APIのモックサーバー。
 来たリクエストをそのまま標準出力に流す。
 クライアントからのアクセスをテストするためのものになると思います。
 
+# Progress
+
+本プロジェクトは開発者自身が2025年1月現在、本業に注力しているため、開発が滞る可能性があります。しかし、プロジェクトの完成は開発者としての重要な目標であり、引き続き少しずつ進めていく予定です。
+
+進捗状況や開発再開のタイミングについては、可能な限りこのリポジトリや関連するコミュニケーションチャネルでお知らせします。
+
+ご理解とご協力をよろしくお願いいたします。
+
 # DEMO
 
 ローカルでテスト用のサーバーを立てるために、
@@ -31,12 +39,16 @@ pip install huga_package
 
 # Usage
 
-DEMOの実行方法など、"zerest_rs"の基本的な使い方を説明する
-
+使用はグローバルインストールがメインとなります。
+npm:
 ```bash
-git clone https://github.com/zerest_rs/~
-cd examples
-python demo.py
+npx zerest
+```
+
+cargo:
+```bash
+cargo install zerest
+cargo-zerest
 ```
 
 # License
