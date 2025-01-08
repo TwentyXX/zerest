@@ -2,6 +2,13 @@
 name = "zerest_rs"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "In the process of being developed by Rust as of January 2025..."
+repository = "https://github.com/TwentyXX/zerest"
+readme = "README.md"
+documentation = "https://docs.rs/zerest"
+keywords = ["mock-server", "zero-configuration", "rest-api", "zerest"]
+categories = []
 
 [dependencies]
 bpaf = "0.9.15"
