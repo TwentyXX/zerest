@@ -2,6 +2,7 @@ use axum::{
     routing::get,
     Router,
 };
+use hyper::server::Server;
 
 /// ルートパスへのGETリクエストに対するハンドラー
 async fn root() -> &'static str {
@@ -19,7 +20,7 @@ pub async fn run_server() -> color_eyre::Result<()> {
     println!("Server running on http://{}", addr);
 
     // サーバーを起動
-    axum::Server::bind(&addr.parse()?)
+    Server::bind(&addr.parse()?)
         .serve(app.into_make_service())
         .await?;
 
