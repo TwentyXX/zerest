@@ -4,6 +4,8 @@ mod word;
 
 use ratatui::DefaultTerminal;
 use std::{io, time::Instant};
+use tokio::sync::mpsc::Receiver;
+use crate::message::ServerMessage;
 
 #[derive(Debug)]
 pub struct App {
@@ -18,6 +20,8 @@ pub struct App {
 	pub(crate) list_items:     Vec<String>,
 	pub(crate) selected_item:  Option<usize>,
 	pub(crate) tree_state:     bool,
+	pub(crate) message_receiver: Receiver<ServerMessage>,
+	pub(crate) messages: Vec<ServerMessage>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -30,8 +34,8 @@ pub(crate) enum FocusedWidget {
 	Tree,
 }
 
-impl Default for App {
-	fn default() -> Self {
+impl App {
+	pub fn new(message_receiver: Receiver<ServerMessage>) -> Self {
 		Self {
 			counter:        0,
 			exit:           false,
@@ -44,6 +48,8 @@ impl Default for App {
 			list_items:     vec!["Item 1".to_string(), "Item 2".to_string(), "Item 3".to_string()],
 			selected_item:  None,
 			tree_state:     false,
+			message_receiver,
+			messages:       Vec::new(),
 		}
 	}
 }
@@ -76,6 +82,11 @@ impl App {
 	/// runs the application's main loop until the user quits
 	pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
 		while !self.exit {
+			// メッセージの確認
+			if let Ok(message) = self.message_receiver.try_recv() {
+				self.messages.push(message);
+			}
+			
 			terminal.draw(|frame| self.draw(frame))?;
 			self.handle_events()?;
 		}
