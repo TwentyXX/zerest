@@ -2,7 +2,7 @@ use axum::{
     routing::get,
     Router,
 };
-use hyper::server::Server;
+use tokio::net::TcpListener;
 
 /// ルートパスへのGETリクエストに対するハンドラー
 async fn root() -> &'static str {
@@ -19,10 +19,9 @@ pub async fn run_server() -> color_eyre::Result<()> {
     let addr = "127.0.0.1:3000";
     println!("Server running on http://{}", addr);
 
-    // サーバーを起動
-    Server::bind(&addr.parse()?)
-        .serve(app.into_make_service())
-        .await?;
+    // リスナーを作成してサーバーを起動
+    let listener = TcpListener::bind(addr).await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }
