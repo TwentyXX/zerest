@@ -6,6 +6,15 @@ use axum::{
 };
 use chrono::Utc;
 use std::sync::{Arc, Mutex};
+
+#[derive(Clone)]
+pub struct ServerState(Arc<Mutex<MessageServer>>);
+
+impl ServerState {
+    pub fn new(server: MessageServer) -> Self {
+        Self(Arc::new(Mutex::new(server)))
+    }
+}
 use tokio::{net::TcpListener, sync::mpsc};
 
 /// メッセージを受け取るハンドラー
@@ -60,11 +69,7 @@ impl MessageServer {
 	}
 
 	pub async fn run(mut self) -> color_eyre::Result<()> {
-		// ServerStateの定義
-		#[derive(Clone)]
-		struct ServerState(Arc<Mutex<MessageServer>>);
-
-		let state = ServerState(Arc::new(Mutex::new(self)));
+		let state = ServerState::new(self);
 
 		// ルーターの設定
 		let app = Router::new()
