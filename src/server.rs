@@ -5,25 +5,24 @@ use axum::{
 	Router,
 };
 use chrono::Utc;
-use std::{borrow::Cow, sync::{Arc, Mutex}};
+use std::sync::{Arc, Mutex};
 use tokio::{net::TcpListener, sync::mpsc};
 
 /// メッセージを受け取るハンドラー
 async fn handle_message(
-	State(tx): State<mpsc::Sender<ServerMessage>>,
+	State(state): State<ServerState>,
 	Json(payload): Json<String>,
-) -> &'static str {
+) -> String {
 	let msg = ServerMessage {
-		content:   payload,
+		content: payload,
 		timestamp: Utc::now(),
 	};
 
-	if let Err(e) = tx.send(msg).await {
-		eprintln!("Failed to send message: {}", e);
-		return "Error processing message";
+	if let Ok(mut server) = state.0.lock() {
+		server.handle_message(msg).await.to_owned()
+	} else {
+		"Server Error".to_owned()
 	}
-
-	"Message received"
 }
 
 pub struct MessageServer {
@@ -69,23 +68,7 @@ impl MessageServer {
 
 		// ルーターの設定
 		let app = Router::new()
-			.route(
-				"/message",
-				get(
-					async move |state: Arc<Mutex<State<ServerState>>>, Json(payload): Json<String>| {
-						let msg = ServerMessage {
-							content:   payload,
-							timestamp: Utc::now(),
-						};
-
-						if let Ok(mut server) = state.lock().unwrap().0.0.lock() {
-							return server.handle_message(msg).await.to_owned()
-						} else {
-							return "Server Error".to_owned()
-						}
-					},
-				),
-			)
+			.route("/message", get(handle_message))
 			.with_state(state);
 
 		// サーバーのアドレスを設定
