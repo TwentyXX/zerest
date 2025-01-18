@@ -4,9 +4,9 @@ mod server;
 mod widget;
 
 use crate::app::App;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use server::MessageServer;
-use std::{io, time::Instant};
+use std::io;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
