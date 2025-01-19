@@ -24,11 +24,11 @@ async fn handle_message(
         timestamp: Utc::now(),
     };
 
-    let response = {
-        let mut server = state.0.lock()
-            .unwrap_or_else(|_| panic!("Failed to acquire lock"));
-        server.handle_message(msg)
-    };
+    let server = state.0.lock()
+        .unwrap_or_else(|_| panic!("Failed to acquire lock"));
+    
+    let response = server.handle_message(msg);
+    drop(server); // Explicitly drop the MutexGuard
 
     match response.await {
         Ok(_) => Json("Message received".to_string()),
@@ -66,7 +66,7 @@ impl MessageServer {
         Ok(())
 	}
 
-	pub async fn run(mut self) -> color_eyre::Result<()> {
+	pub async fn run(self) -> color_eyre::Result<()> {
 		let state = ServerState::new(self);
 
 		// ルーターの設定
