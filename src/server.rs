@@ -1,8 +1,6 @@
 use crate::message::ServerMessage;
 use axum::{
-	extract::{Json, State},
-	routing::get,
-	Router,
+	debug_handler, extract::{Json, State}, routing::get, Router
 };
 use chrono::Utc;
 use std::sync::{Arc, Mutex};
@@ -11,19 +9,15 @@ use std::sync::{Arc, Mutex};
 pub struct ServerState(Arc<Mutex<MessageServer>>);
 
 impl ServerState {
-    pub fn new(server: MessageServer) -> Self {
-        Self(Arc::new(Mutex::new(server)))
-    }
+	pub fn new(server: MessageServer) -> Self { Self(Arc::new(Mutex::new(server))) }
 }
 use tokio::{net::TcpListener, sync::mpsc};
 
+#[debug_handler]
 /// メッセージを受け取るハンドラー
-async fn handle_message(
-	State(state): State<ServerState>,
-	Json(payload): Json<String>,
-) -> String {
+async fn handle_message(State(state): State<ServerState>, Json(payload): Json<String>) -> String {
 	let msg = ServerMessage {
-		content: payload,
+		content:   payload,
 		timestamp: Utc::now(),
 	};
 
