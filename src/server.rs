@@ -15,17 +15,25 @@ use tokio::{net::TcpListener, sync::mpsc};
 
 #[debug_handler]
 /// メッセージを受け取るハンドラー
-async fn handle_message(State(state): State<ServerState>, Json(payload): Json<String>) -> String {
-	let msg = ServerMessage {
-		content:   payload,
-		timestamp: Utc::now(),
-	};
+async fn handle_message(
+    State(state): State<ServerState>,
+    Json(payload): Json<String>,
+) -> Json<String> {
+    let msg = ServerMessage {
+        content: payload,
+        timestamp: Utc::now(),
+    };
 
-	if let Ok(mut server) = state.0.lock() {
-		server.handle_message(msg).await.to_owned()
-	} else {
-		"Server Error".to_owned()
-	}
+    let response = {
+        let mut server = state.0.lock()
+            .unwrap_or_else(|_| panic!("Failed to acquire lock"));
+        server.handle_message(msg)
+    };
+
+    match response.await {
+        Ok(_) => Json("Message received".to_string()),
+        Err(_) => Json("Server Error".to_string()),
+    }
 }
 
 pub struct MessageServer {
@@ -47,19 +55,15 @@ impl MessageServer {
 		self.handlers.push(Box::new(handler));
 	}
 
-	async fn handle_message(&mut self, msg: ServerMessage) -> &'static str {
-		// 全てのハンドラーを実行
-		for handler in &mut self.handlers {
-			handler(&msg);
-		}
+    async fn handle_message(&mut self, msg: ServerMessage) -> Result<(), Box<dyn std::error::Error>> {
+        // 全てのハンドラーを実行
+        for handler in &mut self.handlers {
+            handler(&msg);
+        }
 
-		// メッセージを送信
-		if let Err(e) = self.tx.send(msg).await {
-			eprintln!("Failed to send message: {}", e);
-			return "Error processing message";
-		}
-
-		"Message received"
+        // メッセージを送信
+        self.tx.send(msg).await?;
+        Ok(())
 	}
 
 	pub async fn run(mut self) -> color_eyre::Result<()> {
