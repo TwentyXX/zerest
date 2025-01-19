@@ -11,7 +11,7 @@ keywords = ["mock-server", "zero-configuration", "rest-api", "zerest"]
 categories = []
 
 [dependencies]
-axum = "0.8.1"
+axum = { version = "0.8.1", features = ["macros"] }
 bpaf = "0.9.15"
 chrono = { version = "0.4.39", features = ["serde"] }
 color-eyre = "0.6.3"
@@ -20,4 +20,4 @@ rand = "0.8.5"
 ratatui = "0.29.0"
 serde = { version = "1.0.217", features = ["derive"] }
 tokio = { version = "1.43.0", features = ["full"] }
-
+anyhow = "1.0.95"
