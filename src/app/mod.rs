@@ -2,26 +2,26 @@ mod event;
 mod ui;
 mod word;
 
+use crate::message::ServerMessage;
 use ratatui::DefaultTerminal;
 use std::{io, time::Instant};
 use tokio::sync::mpsc::Receiver;
-use crate::message::ServerMessage;
 
 #[derive(Debug)]
 pub struct App {
-	pub counter:               u8,
-	pub(crate) exit:           bool,
-	pub(crate) current_word:   String,
-	pub(crate) last_update:    Instant,
-	pub(crate) checkbox_state: bool,
-	pub(crate) slider_value:   u8,
-	pub(crate) input_text:     String,
-	pub(crate) focused_widget: FocusedWidget,
-	pub(crate) list_items:     Vec<String>,
-	pub(crate) selected_item:  Option<usize>,
-	pub(crate) tree_state:     bool,
+	pub counter:                 u8,
+	pub(crate) exit:             bool,
+	pub(crate) current_word:     String,
+	pub(crate) last_update:      Instant,
+	pub(crate) checkbox_state:   bool,
+	pub(crate) slider_value:     u8,
+	pub(crate) input_text:       String,
+	pub(crate) focused_widget:   FocusedWidget,
+	pub(crate) list_items:       Vec<String>,
+	pub(crate) selected_item:    Option<usize>,
+	pub(crate) tree_state:       bool,
 	pub(crate) message_receiver: Receiver<ServerMessage>,
-	pub(crate) messages: Vec<ServerMessage>,
+	pub(crate) messages:         Vec<ServerMessage>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -37,19 +37,23 @@ pub(crate) enum FocusedWidget {
 impl App {
 	pub fn new(message_receiver: Receiver<ServerMessage>) -> Self {
 		Self {
-			counter:        0,
-			exit:           false,
-			current_word:   String::from("Lorem"),
-			last_update:    Instant::now(),
+			counter: 0,
+			exit: false,
+			current_word: String::from("Lorem"),
+			last_update: Instant::now(),
 			checkbox_state: false,
-			slider_value:   50,
-			input_text:     String::new(),
+			slider_value: 50,
+			input_text: String::new(),
 			focused_widget: FocusedWidget::Counter,
-			list_items:     vec!["Item 1".to_string(), "Item 2".to_string(), "Item 3".to_string()],
-			selected_item:  None,
-			tree_state:     false,
+			list_items: vec![
+				"Item 1".to_string(),
+				"Item 2".to_string(),
+				"Item 3".to_string(),
+			],
+			selected_item: None,
+			tree_state: false,
 			message_receiver,
-			messages:       Vec::new(),
+			messages: Vec::new(),
 		}
 	}
 }
@@ -86,7 +90,7 @@ impl App {
 			if let Ok(message) = self.message_receiver.try_recv() {
 				self.messages.push(message);
 			}
-			
+
 			terminal.draw(|frame| self.draw(frame))?;
 			self.handle_events()?;
 		}

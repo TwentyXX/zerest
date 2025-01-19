@@ -82,6 +82,7 @@ impl App {
 			.block(tree_block)
 			.render(area, buf);
 	}
+
 	fn render_counter(&self, area: Rect, buf: &mut Buffer) {
 		let counter_text = Text::from(vec![Line::from(vec![
 			"Counter: ".into(),
@@ -101,7 +102,11 @@ impl App {
 	fn render_checkbox(&self, area: Rect, buf: &mut Buffer) {
 		let checkbox_text = format!(
 			"[{}] Checkbox Option",
-			if self.checkbox_state { "x" } else { " " }
+			if self.checkbox_state {
+				"x"
+			} else {
+				" "
+			}
 		);
 
 		let checkbox_block = Block::default()

@@ -1,6 +1,9 @@
 use crate::message::ServerMessage;
 use axum::{
-	debug_handler, extract::{Json, State}, routing::get, Router
+	debug_handler,
+	extract::{Json, State},
+	routing::get,
+	Router,
 };
 use chrono::Utc;
 use std::sync::{Arc, Mutex};
@@ -15,29 +18,29 @@ use tokio::{net::TcpListener, sync::mpsc};
 
 /// メッセージを受け取るハンドラー
 async fn handle_message(
-    State(state): State<ServerState>,
-    Json(payload): Json<String>,
+	State(state): State<ServerState>,
+	Json(payload): Json<String>,
 ) -> Json<String> {
-    let msg = ServerMessage {
-        content: payload,
-        timestamp: Utc::now(),
-    };
+	let msg = ServerMessage {
+		content:   payload,
+		timestamp: Utc::now(),
+	};
 
-    // MutexGuardのスコープを最小限に
-    let tx = {
-        let mut server = state.0.lock().unwrap();
-        // ハンドラーを実行
-        for handler in &mut server.handlers {
-            handler(&msg);
-        }
-        server.tx.clone()
-    };
+	// MutexGuardのスコープを最小限に
+	let tx = {
+		let mut server = state.0.lock().unwrap();
+		// ハンドラーを実行
+		for handler in &mut server.handlers {
+			handler(&msg);
+		}
+		server.tx.clone()
+	};
 
-    // ロックを解放した後でメッセージを送信
-    match tx.send(msg).await {
-        Ok(_) => Json("Message received".to_string()),
-        Err(_) => Json("Server Error".to_string()),
-    }
+	// ロックを解放した後でメッセージを送信
+	match tx.send(msg).await {
+		Ok(_) => Json("Message received".to_string()),
+		Err(_) => Json("Server Error".to_string()),
+	}
 }
 
 pub struct MessageServer {
@@ -58,7 +61,6 @@ impl MessageServer {
 		F: FnMut(&ServerMessage) + Send + Sync + 'static, {
 		self.handlers.push(Box::new(handler));
 	}
-
 
 	pub async fn run(self) -> color_eyre::Result<()> {
 		let state = ServerState::new(self);
