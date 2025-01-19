@@ -13,7 +13,6 @@ impl ServerState {
 }
 use tokio::{net::TcpListener, sync::mpsc};
 
-#[debug_handler]
 /// メッセージを受け取るハンドラー
 async fn handle_message(
     State(state): State<ServerState>,
@@ -24,13 +23,18 @@ async fn handle_message(
         timestamp: Utc::now(),
     };
 
-    let result = {
-        let mut server = state.0.lock()
-            .unwrap_or_else(|_| panic!("Failed to acquire lock"));
-        server.handle_message(msg).await
+    // MutexGuardのスコープを最小限に
+    let tx = {
+        let mut server = state.0.lock().unwrap();
+        // ハンドラーを実行
+        for handler in &mut server.handlers {
+            handler(&msg);
+        }
+        server.tx.clone()
     };
 
-    match result {
+    // ロックを解放した後でメッセージを送信
+    match tx.send(msg).await {
         Ok(_) => Json("Message received".to_string()),
         Err(_) => Json("Server Error".to_string()),
     }
@@ -55,23 +59,13 @@ impl MessageServer {
 		self.handlers.push(Box::new(handler));
 	}
 
-    async fn handle_message(&mut self, msg: ServerMessage) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // 全てのハンドラーを実行
-        for handler in &mut self.handlers {
-            handler(&msg);
-        }
-
-        // メッセージを送信
-        self.tx.send(msg).await?;
-        Ok(())
-    }
 
 	pub async fn run(self) -> color_eyre::Result<()> {
 		let state = ServerState::new(self);
 
 		// ルーターの設定
 		let app = Router::new()
-			.route("/message", get(handle_message))
+			.route("/message", get(handle_message).post(handle_message))
 			.with_state(state);
 
 		// サーバーのアドレスを設定
