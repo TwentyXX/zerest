@@ -19,7 +19,6 @@ async fn main() -> io::Result<()> {
 
 	// メッセージハンドラーの登録
 	server.on_message(move |msg| {
-		println!("Received message: {:?}", msg);
 		t2.send(message::ServerMessage {
 			content:   "hello".to_string(),
 			timestamp: Utc::now(),

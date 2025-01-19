@@ -17,7 +17,30 @@ impl ServerState {
 use tokio::{net::TcpListener, sync::mpsc};
 
 /// メッセージを受け取るハンドラー
-async fn handle_message(
+async fn handle_message_get(State(state): State<ServerState>) -> Json<String> {
+	let msg = ServerMessage {
+		content:   "Accessed from browser.".to_owned(),
+		timestamp: Utc::now(),
+	};
+
+	// MutexGuardのスコープを最小限に
+	let tx = {
+		let mut server = state.0.lock().unwrap();
+		// ハンドラーを実行
+		for handler in &mut server.handlers {
+			handler(&msg);
+		}
+		server.tx.clone()
+	};
+
+	// ロックを解放した後でメッセージを送信
+	match tx.send(msg).await {
+		Ok(_) => Json("Message received".to_string()),
+		Err(_) => Json("Server Error".to_string()),
+	}
+}
+/// メッセージを受け取るハンドラー
+async fn handle_message_post(
 	State(state): State<ServerState>,
 	Json(payload): Json<String>,
 ) -> Json<String> {
@@ -67,7 +90,7 @@ impl MessageServer {
 
 		// ルーターの設定
 		let app = Router::new()
-			.route("/message", get(handle_message).post(handle_message))
+			.route("/", get(handle_message_get).post(handle_message_post))
 			.with_state(state);
 
 		// サーバーのアドレスを設定

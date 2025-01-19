@@ -31,7 +31,7 @@ impl App {
 
 		// 1秒ごとに単語を更新
 		if self.last_update.elapsed() >= Duration::from_millis(100) {
-			self.update_word();
+			// self.update_word();
 			self.last_update = Instant::now();
 		}
 		Ok(())

@@ -88,6 +88,7 @@ impl App {
 		while !self.exit {
 			// メッセージの確認
 			if let Ok(message) = self.message_receiver.try_recv() {
+				self.current_word.push_str(&message.content);
 				self.messages.push(message);
 			}
 
