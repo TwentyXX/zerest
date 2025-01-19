@@ -24,13 +24,13 @@ async fn handle_message(
         timestamp: Utc::now(),
     };
 
-    let server = state.0.lock()
-        .unwrap_or_else(|_| panic!("Failed to acquire lock"));
-    
-    let response = server.handle_message(msg);
-    drop(server); // Explicitly drop the MutexGuard
+    let result = {
+        let mut server = state.0.lock()
+            .unwrap_or_else(|_| panic!("Failed to acquire lock"));
+        server.handle_message(msg).await
+    };
 
-    match response.await {
+    match result {
         Ok(_) => Json("Message received".to_string()),
         Err(_) => Json("Server Error".to_string()),
     }
@@ -55,7 +55,7 @@ impl MessageServer {
 		self.handlers.push(Box::new(handler));
 	}
 
-    async fn handle_message(&mut self, msg: ServerMessage) -> Result<(), Box<dyn std::error::Error>> {
+    async fn handle_message(&mut self, msg: ServerMessage) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // 全てのハンドラーを実行
         for handler in &mut self.handlers {
             handler(&msg);
@@ -64,7 +64,7 @@ impl MessageServer {
         // メッセージを送信
         self.tx.send(msg).await?;
         Ok(())
-	}
+    }
 
 	pub async fn run(self) -> color_eyre::Result<()> {
 		let state = ServerState::new(self);
