@@ -1,6 +1,5 @@
 use crate::message::ServerMessage;
 use axum::{
-	debug_handler,
 	extract::{Json, State},
 	http::HeaderMap,
 	routing::get,

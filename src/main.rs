@@ -33,7 +33,7 @@ async fn main() -> io::Result<()> {
 	});
 
 	// UIアプリケーションの起動
-	let mut terminal = ratatui::init()?;
+	let mut terminal = ratatui::init();
 	// マウスキャプチャを有効化
 	crossterm::execute!(
 		std::io::stdout(),
