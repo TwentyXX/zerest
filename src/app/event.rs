@@ -92,6 +92,8 @@ impl App {
 		};
 		guard!(key_code,
 			KeyCode::Char('q') => self.exit(),
+			KeyCode::PageUp => self.scroll_offset = self.scroll_offset.saturating_sub(1),
+			KeyCode::PageDown => self.scroll_offset = self.scroll_offset.saturating_add(1),
 		)
 	}
 }

@@ -22,6 +22,7 @@ pub struct App {
 	pub(crate) tree_state:       bool,
 	pub(crate) message_receiver: Receiver<ServerMessage>,
 	pub(crate) messages:         Vec<ServerMessage>,
+	pub(crate) scroll_offset:    u16,
 }
 
 #[derive(Debug, PartialEq)]
@@ -54,6 +55,7 @@ impl App {
 			tree_state: false,
 			message_receiver,
 			messages: Vec::new(),
+			scroll_offset: 0,
 		}
 	}
 }

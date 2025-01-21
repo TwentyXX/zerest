@@ -1,7 +1,7 @@
 use ratatui::{
 	layout::{self, Constraint, Direction},
 	text::Text,
-	widgets::{Block, Paragraph},
+	widgets::{Block, Paragraph, Wrap},
 	Frame,
 };
 
@@ -23,7 +23,8 @@ impl App {
 		frame.render_widget(
 			Paragraph::new(word_text)
 				.block(word_block)
-				.wrap(ratatui::widgets::Wrap { trim: true }),
+				.wrap(Wrap { trim: true })
+				.scroll((self.scroll_offset, 0)),
 			chunks[1],
 		);
 	}
