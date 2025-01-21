@@ -25,9 +25,7 @@ impl App {
 				Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
 					self.handle_key_event(key_event)
 				}
-				Event::Mouse(mouse_event) => {
-					self.handle_mouse_event(mouse_event)
-				}
+				Event::Mouse(mouse_event) => self.handle_mouse_event(mouse_event),
 				_ => {}
 			}
 		}

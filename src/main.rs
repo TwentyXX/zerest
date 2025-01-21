@@ -35,17 +35,11 @@ async fn main() -> io::Result<()> {
 	// UIアプリケーションの起動
 	let mut terminal = ratatui::init();
 	// マウスキャプチャを有効化
-	crossterm::execute!(
-		std::io::stdout(),
-		crossterm::event::EnableMouseCapture
-	)?;
+	crossterm::execute!(std::io::stdout(), crossterm::event::EnableMouseCapture)?;
 	let mut app = App::new(rx);
 	let app_result = app.run(&mut terminal);
 	// 終了時にマウスキャプチャを無効化
-	crossterm::execute!(
-		std::io::stdout(),
-		crossterm::event::DisableMouseCapture
-	)?;
+	crossterm::execute!(std::io::stdout(), crossterm::event::DisableMouseCapture)?;
 	ratatui::restore();
 
 	app_result
