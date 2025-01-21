@@ -1,4 +1,4 @@
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent, MouseEventKind};
 use std::{
 	io,
 	time::{Duration, Instant},
@@ -24,6 +24,9 @@ impl App {
 			match event::read()? {
 				Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
 					self.handle_key_event(key_event)
+				}
+				Event::Mouse(mouse_event) => {
+					self.handle_mouse_event(mouse_event)
 				}
 				_ => {}
 			}
@@ -95,5 +98,17 @@ impl App {
 			KeyCode::PageUp => self.scroll_offset = self.scroll_offset.saturating_sub(1),
 			KeyCode::PageDown => self.scroll_offset = self.scroll_offset.saturating_add(1),
 		)
+	}
+
+	pub(crate) fn handle_mouse_event(&mut self, mouse_event: MouseEvent) {
+		match mouse_event.kind {
+			MouseEventKind::ScrollUp => {
+				self.scroll_offset = self.scroll_offset.saturating_sub(1);
+			}
+			MouseEventKind::ScrollDown => {
+				self.scroll_offset = self.scroll_offset.saturating_add(1);
+			}
+			_ => {}
+		}
 	}
 }
