@@ -2,10 +2,12 @@ use crate::message::ServerMessage;
 use axum::{
 	debug_handler,
 	extract::{Json, State},
+	http::HeaderMap,
 	routing::get,
 	Router,
 };
 use chrono::Utc;
+use serde_json::Value;
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone)]
@@ -17,9 +19,17 @@ impl ServerState {
 use tokio::{net::TcpListener, sync::mpsc};
 
 /// メッセージを受け取るハンドラー
-async fn handle_message_get(State(state): State<ServerState>) -> Json<String> {
+async fn handle_message_get(headers: HeaderMap, State(state): State<ServerState>) -> Json<String> {
+	let json = serde_json::Map::from_iter(headers.iter().map(|(name, value)| {
+		(
+			name.to_string(),
+			Value::String(value.to_str().unwrap_or_default().to_owned()),
+		)
+	}));
+
+	let header_string = serde_json::to_string_pretty(&json).unwrap();
 	let msg = ServerMessage {
-		content:   "Accessed from browser.".to_owned(),
+		content:   header_string,
 		timestamp: Utc::now(),
 	};
 

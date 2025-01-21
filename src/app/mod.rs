@@ -39,7 +39,7 @@ impl App {
 		Self {
 			counter: 0,
 			exit: false,
-			current_word: String::from("Lorem"),
+			current_word: String::new(),
 			last_update: Instant::now(),
 			checkbox_state: false,
 			slider_value: 50,
@@ -89,6 +89,7 @@ impl App {
 			// メッセージの確認
 			if let Ok(message) = self.message_receiver.try_recv() {
 				self.current_word.push_str(&message.content);
+				self.current_word.push('\n');
 				self.messages.push(message);
 			}
 

@@ -23,7 +23,6 @@ impl App {
 		frame.render_widget(
 			Paragraph::new(word_text)
 				.block(word_block)
-				.centered()
 				.wrap(ratatui::widgets::Wrap { trim: true }),
 			chunks[1],
 		);
