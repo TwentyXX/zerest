@@ -1,13 +1,14 @@
 use crate::message::ServerMessage;
 use axum::{
 	extract::{Json, State},
-	http::HeaderMap,
+	http::{HeaderMap, Method},
 	routing::get,
 	Router,
 };
 use chrono::Utc;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
+use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
 pub struct ServerState(Arc<Mutex<MessageServer>>);
@@ -98,8 +99,16 @@ impl MessageServer {
 		let state = ServerState::new(self);
 
 		// ルーターの設定
+		// CORSの設定
+		let cors = CorsLayer::new()
+			.allow_origin(tower_http::cors::Any)
+			.allow_methods([Method::GET, Method::POST, Method::CONNECT, Method::OPTIONS])
+			.allow_headers(tower_http::cors::Any);
+
+		// ルーターの設定にCORSレイヤーを追加
 		let app = Router::new()
 			.route("/", get(handle_message_get).post(handle_message_post))
+			.layer(cors)
 			.with_state(state);
 
 		// サーバーのアドレスを設定
