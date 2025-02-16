@@ -103,7 +103,7 @@ impl MessageServer {
 			.with_state(state);
 
 		// サーバーのアドレスを設定
-		let addr = "127.0.0.1:3000";
+		let addr = "0.0.0.0:3000";
 		println!("Server running on http://{}", addr);
 
 		// リスナーを作成してサーバーを起動
