@@ -39,8 +39,9 @@ impl MessageServer {
 		// CORSの設定
 		let cors = CorsLayer::new()
 			.allow_origin(tower_http::cors::Any)
-			.allow_methods([Method::GET, Method::POST, Method::CONNECT, Method::OPTIONS])
-			.allow_headers(tower_http::cors::Any);
+			.allow_methods(tower_http::cors::Any)
+			.allow_headers(tower_http::cors::Any)
+			.expose_headers(tower_http::cors::Any);
 
 		// ルーターの設定にCORSレイヤーを追加
 		let app = Router::new()
